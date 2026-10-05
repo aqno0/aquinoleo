@@ -1,6 +1,7 @@
 /**
  * Leo Aquino Portfolio — Interactive Engine
  * Themes: Black, Simple, Creative
+ * Accent: Electric Cyan (#00f0ff)
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -13,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* --------------------------------------------------------------------------
-   1. Ambient Mouse Spotlight
+   1. Ambient Mouse Spotlight (Electric Cyan Tint)
    -------------------------------------------------------------------------- */
 function initSpotlight() {
   const glow = document.getElementById('ambientGlow');
@@ -30,8 +31,8 @@ function initSpotlight() {
   }, { passive: true });
 
   function renderGlow() {
-    currentX += (mouseX - currentX) * 0.1;
-    currentY += (mouseY - currentY) * 0.1;
+    currentX += (mouseX - currentX) * 0.08;
+    currentY += (mouseY - currentY) * 0.08;
     glow.style.left = `${currentX}px`;
     glow.style.top = `${currentY}px`;
     requestAnimationFrame(renderGlow);
@@ -93,7 +94,7 @@ function initLightbox() {
 }
 
 /* --------------------------------------------------------------------------
-   4. The Ink Pad (Interactive Canvas)
+   4. The Digital Ink Lab (Interactive Canvas with Cyan & White Ink)
    -------------------------------------------------------------------------- */
 function initSketchpad() {
   const canvas = document.getElementById('doodleCanvas');
@@ -101,18 +102,19 @@ function initSketchpad() {
   const clearBtn = document.getElementById('clearCanvasBtn');
   const saveBtn = document.getElementById('saveCanvasBtn');
   const sizeBtns = document.querySelectorAll('.brush-size');
+  const swatches = document.querySelectorAll('.color-swatch');
   if (!canvas) return;
 
   const ctx = canvas.getContext('2d');
   let isDrawing = false;
   let brushSize = 2;
+  let inkColor = '#00f0ff'; // Default Electric Cyan
   let hasDrawn = false;
 
   function resizeCanvas() {
     const rect = canvas.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
     
-    // Save current content if any
     let tempCanvas = null;
     if (hasDrawn) {
       tempCanvas = document.createElement('canvas');
@@ -131,7 +133,6 @@ function initSketchpad() {
   }
 
   window.addEventListener('resize', resizeCanvas);
-  // Initial size setup
   setTimeout(resizeCanvas, 50);
 
   // Brush sizing
@@ -140,6 +141,15 @@ function initSketchpad() {
       sizeBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       brushSize = parseInt(btn.dataset.size, 10) || 2;
+    });
+  });
+
+  // Color Swatches
+  swatches.forEach(swatch => {
+    swatch.addEventListener('click', () => {
+      swatches.forEach(s => s.classList.remove('active'));
+      swatch.classList.add('active');
+      inkColor = swatch.dataset.color || '#00f0ff';
     });
   });
 
@@ -162,7 +172,7 @@ function initSketchpad() {
     ctx.moveTo(x, y);
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    ctx.strokeStyle = '#ffffff';
+    ctx.strokeStyle = inkColor;
     ctx.lineWidth = brushSize;
   }
 
@@ -199,17 +209,16 @@ function initSketchpad() {
   // Save / Download Sketch
   if (saveBtn) {
     saveBtn.addEventListener('click', () => {
-      // Create output canvas with black background
       const outCanvas = document.createElement('canvas');
       outCanvas.width = canvas.width;
       outCanvas.height = canvas.height;
       const outCtx = outCanvas.getContext('2d');
-      outCtx.fillStyle = '#060608';
+      outCtx.fillStyle = '#050508';
       outCtx.fillRect(0, 0, outCanvas.width, outCanvas.height);
       outCtx.drawImage(canvas, 0, 0);
 
       const link = document.createElement('a');
-      link.download = `leo-aquino-sketch-${Date.now()}.png`;
+      link.download = `leo-aquino-digital-ink-${Date.now()}.png`;
       link.href = outCanvas.toDataURL('image/png');
       link.click();
     });
@@ -231,16 +240,18 @@ function initCopyEmail() {
     navigator.clipboard.writeText(email).then(() => {
       const originalText = btn.textContent;
       btn.textContent = 'Copied!';
-      btn.style.background = '#ffffff';
-      btn.style.color = '#000000';
+      btn.style.background = 'var(--cyan)';
+      btn.style.color = '#050508';
+      btn.style.boxShadow = '0 0 16px rgba(0, 240, 255, 0.6)';
       
       setTimeout(() => {
         btn.textContent = originalText;
         btn.style.background = '';
         btn.style.color = '';
+        btn.style.boxShadow = '';
       }, 2000);
     }).catch(() => {
-      alert(`Email: ${email}`);
+      prompt('Copy email:', email);
     });
   });
 }
@@ -249,7 +260,6 @@ function initCopyEmail() {
    6. 3D Tilt Effect on Work Cards
    -------------------------------------------------------------------------- */
 function initTiltEffect() {
-  // Only enable on desktop/pointers that support hover
   if (window.matchMedia('(hover: none)').matches) return;
 
   const cards = document.querySelectorAll('[data-tilt]');
